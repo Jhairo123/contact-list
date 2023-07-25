@@ -87,9 +87,12 @@ function realizarPeticion(seleccion) {
       eliminarContacto();
       break;
     case 3:
-      mostrarLista();
+      actualizarContacto();
       break;
     case 4:
+      mostrarLista();
+      break;
+    case 5:
       exit = true;
       salir();
       break;
