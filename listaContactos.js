@@ -3,21 +3,28 @@ let arrayContacto = [];
 let textoMenu = "";
 let contar = 0;
 let exit = false;
+let contacto = "";
 
 //Este arreglo tiene dos elementos, y cada elemento es un objeto que contiene las propiedades nombre y apellido con sus respectivos valores.
-arrayContacto = [
-  {
-    nombre: "Juan",
-    apellido: "Gomez",
-  },
-  {
-    nombre: "Miles",
-    apellido: "Morales",
-  },
-];
+
+const fs = require("fs");
+
+fs.readFile("contactos.json", "utf8", (err, data) => {
+  if (err) {
+    console.error("Error al leer el archivo:", err);
+    return;
+  }
+
+  try {
+    arrayContacto = JSON.parse(data);
+  } catch (error) {
+    console.error("Error al parsear el JSON:", error);
+  }
+});
 
 const { count } = require("console");
 const readline = require("readline");
+const { exitCode } = require("process");
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -115,67 +122,82 @@ function salir() {
  * @returns {function} Una funcion que recibe dos argumentos: un metodo y el tiempo de ejecucion en milisegundos .
  */
 function crearContacto() {
-  rl.question("Ingrese el contacto que desea guardar: ", (nombre) => {
-    let repeticion = false;
-    let completo = nombre.includes(" ");
-    let nombreCompleto = nombre.split(" ");
-    for (let i = 0; i < arrayContacto.length && !repeticion; i++) {
-      let cadena = arrayContacto[i].nombre + " " + arrayContacto[i].apellido;
-      repeticion = nombre.toLowerCase() === cadena.toLowerCase();
-    }
-    if (repeticion) {
-      console.log("El contacto no se puede crear porque el contacto ya existe");
-      repeticion = false;
-    } else if (!completo) {
-      console.log("El contacto debe contener un apellido para ser guardado");
-    } else {
-      const contacto = {
-        nombre: nombreCompleto[0],
-        apellido: nombreCompleto[1],
-      };
-      arrayContacto.push(contacto);
-      console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
-      console.log(">>\t\t" + nombre + "\t\t<<");
-      console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
-      console.log("El contacto ha sido creado satisfactoriamente");
-    }
-    return setTimeout(salir, 1000);
+  let indice = 0;
+  const { v4: uuidv4 } = require("uuid");
+  const idUnico = uuidv4();
+
+  console.log("Ingrese los datos de contacto:");
+  rl.question("Ingrese los nombres: ", (nombre) => {
+    rl.question("Ingrese los apellidos: ", (apellido) => {
+      rl.question("Ingrese el telefono: ", (telefono) => {
+        rl.question("Ingrese la ciudad : ", (ciudad) => {
+          rl.question("Ingrese la direccion : ", (direccion) => {
+            const nuevoContacto = {
+              id: idUnico,
+              nombre: nombre,
+              apellido: apellido,
+              telefono: telefono,
+              ubicacion: [ciudad, direccion],
+            };
+            arrayContacto.push(nuevoContacto);
+            indice = arrayContacto.length - 1;
+            console.log(arrayContacto[indice]);
+
+            contacto = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\n";
+            contacto += "X Id: " + arrayContacto[indice].id + " \n";
+            contacto +=
+              "X Nombres: " + arrayContacto[indice].nombre + "\t\t\tX\n";
+            contacto +=
+              "X Apellidos: " + arrayContacto[indice].apellido + "\t\tX\n";
+            contacto +=
+              "X Telefono: " + arrayContacto[indice].telefono + "\t\t\tX\n";
+            contacto +=
+              "X Ciudad: " + arrayContacto[indice].ubicacion[0] + "\t\t\tX\n";
+            contacto +=
+              "X Direccion: " + arrayContacto[indice].ubicacion[1] + "\t\tX\n";
+            contacto += "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\n";
+            contacto += "El contacto ha sido creado satisfactoriamente";
+            console.log(contacto);
+
+            return setTimeout(salir, 1000);
+          });
+        });
+      });
+    });
   });
 }
-
 /**
  * Este es un método que elimina un contacto.
  * @returns {function} Una funcion que recibe dos argumentos: un metodo y el tiempo de ejecucion en milisegundos .
  */
 function eliminarContacto() {
-  rl.question("Ingrese el contacto que desea borrar: ", (nombre) => {
-    let repeticion = false;
-    let completo = nombre.includes(" ");
-    let indice;
-    if (!completo) {
-      console.log("El contacto debe contener un apellido para ser eliminado");
-    } else {
-      for (let i = 0; i < arrayContacto.length && !repeticion; i++) {
-        let cadena = arrayContacto[i].nombre + " " + arrayContacto[i].apellido;
-        repeticion = nombre.toLowerCase() === cadena.toLowerCase();
-        repeticion == true ? (indice = i) : (indice = -1);
-        // console.log(cadena);
-      }
-      if (!repeticion) {
-        console.log(
-          "El contacto no se puede eliminar porque el contacto no existe"
-        );
-        repeticion = false;
-      } else if (!completo) {
-        console.log("El contacto debe contener un apellido para ser eliminado");
-      } else {
-        arrayContacto.splice(indice, 1);
-        console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
-        console.log(">>\t\t" + nombre + "\t\t<<");
-        console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
-        console.log("El contacto ha sido eliminado satisfactoriamente");
+  rl.question("Ingrese el id del contacto que desea borrar: ", (id) => {
+    let existe = false;
+    let mensaje = "";
+    let arrayTemp = [];
+    for (let i = 0; i < arrayContacto.length; i++) {
+      existe = id == arrayContacto[i].id;
+      if (existe) {
+        arrayTemp.push(arrayContacto[i]);
+        console.log(arrayContacto[i]);
+        arrayContacto.splice(i, 1);
+        break;
       }
     }
+
+    existe
+      ? (mensaje = "El contacto se ha elimando por id satisfactoriamente")
+      : (mensaje = "El id ingresado no esta asociado a ningun contacto");
+    contacto = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\n";
+    contacto += "X Id: " + arrayTemp[0].id + "\n";
+    contacto += "X Nombres: " + arrayTemp[0].nombre + "\n";
+    contacto += "X Apellidos: " + arrayTemp[0].apellido + "\n";
+    contacto += "X Telefono: " + arrayTemp[0].telefono + "\n";
+    contacto += "X Ciudad: " + arrayTemp[0].ubicacion[0] + "\n";
+    contacto += "X Direccion: " + arrayTemp[0].ubicacion[1] + "\n";
+    contacto += "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\n";
+    contacto += mensaje;
+    console.log(contacto);
     return setTimeout(salir, 1000);
   });
 }
@@ -185,11 +207,19 @@ function eliminarContacto() {
  * @returns {function} Una funcion que recibe dos argumentos: un metodo y el tiempo de ejecucion en milisegundos .
  */
 function mostrarLista() {
+  // Función para leer el archivo JSON externo y convertirlo en un arreglo de objetos
+
   for (let i = 0; i < arrayContacto.length; i++) {
-    let contacto = arrayContacto[i].nombre + " " + arrayContacto[i].apellido;
-    console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
-    console.log(">>\t\t" + contacto + "\t\t<<");
-    console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+    contacto = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\n";
+    contacto += "X Id: " + arrayContacto[i].id + " \n";
+    contacto += "X Nombres: " + arrayContacto[i].nombre + "\n";
+    contacto += "X Apellidos: " + arrayContacto[i].apellido + "\n";
+    contacto += "X Telefono: " + arrayContacto[i].telefono + "\n";
+    contacto += "X Ciudad: " + arrayContacto[i].ubicacion[0] + "\n";
+    contacto += "X Direccion: " + arrayContacto[i].ubicacion[1] + "\n";
+    contacto += "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\n";
+
+    console.log(contacto);
   }
   return setTimeout(salir, 3000);
 }

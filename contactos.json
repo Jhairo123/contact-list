@@ -1,0 +1,42 @@
+[
+    {
+        "id": "1",
+        "nombre": "Armando",
+        "apellido": "Casas",
+        "telefono": "311238998",
+        "ubicacion": [
+            "Barcelona",
+            "Plaza del Pilar, 12"
+        ]
+    },
+    {
+        "id": "2",
+        "nombre": "Aitor",
+        "apellido": "Menta",
+        "telefono": "311238998",
+        "ubicacion": [
+            "Sevilla",
+            "Calle Sevilla, 10"
+        ]
+    },
+    {
+        "id": "3",
+        "nombre": "Aylen",
+        "apellido": "Tejas",
+        "telefono": "311238998",
+        "ubicacion": [
+            "Madrid",
+            "Paseo de la Castellana, 2"
+        ]
+    },
+    {
+        "id": "4",
+        "nombre": "Jaime",
+        "apellido": "Havizan",
+        "telefono": "311238998",
+        "ubicacion": [
+            "Madrid",
+            "Paseo de la Castellana, 5"
+        ]
+    }
+]
