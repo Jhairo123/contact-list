@@ -1,11 +1,11 @@
 //Declaracion y definicion de las variables
 let arrayContacto = [];
 let textoMenu = "";
+let textoMenu2 = "";
 let contar = 0;
 let exit = false;
 let contacto = "";
-
-//Este arreglo tiene dos elementos, y cada elemento es un objeto que contiene las propiedades nombre y apellido con sus respectivos valores.
+let indice;
 
 const fs = require("fs");
 
@@ -22,7 +22,7 @@ fs.readFile("contactos.json", "utf8", (err, data) => {
   }
 });
 
-const { count } = require("console");
+const { count, log } = require("console");
 const readline = require("readline");
 const { exitCode } = require("process");
 
@@ -37,39 +37,22 @@ const rl = readline.createInterface({
  */
 function verMenu() {
   let seleccion;
-  textoMenu = "|=======================================|\n";
+  textoMenu = "\n";
+  textoMenu += "|=======================================|\n";
   textoMenu += "|\t Lista de contactos\t\t|\n";
   textoMenu += "|=======================================|\n";
   textoMenu += "| 1. Añadir contacto.\t\t\t|\n";
   textoMenu += "| 2. Borrar contacto.\t\t\t|\n";
-  textoMenu += "| 3. Mostrar lista de contactos.\t|\n";
-  textoMenu += "| 4. Salir.\t\t\t\t|\n";
+  textoMenu += "| 3. Actualizar contacto.\t\t|\n";
+  textoMenu += "| 4. Mostrar lista de contactos.\t|\n";
+  textoMenu += "| 5. Salir.\t\t\t\t|\n";
   textoMenu += "|=======================================|";
-
   console.log(textoMenu);
-  rl.question("\tIngrese una opcion: ", (opcion) => {
+  console.log("|=======================================|");
+  rl.question("| \tIngrese una opcion: ", (opcion) => {
     console.log("|=======================================|\n");
     seleccion = parseInt(opcion);
-    if (!isNaN(seleccion) && seleccion > 0 && seleccion < 5) {
-      //console.log(seleccion + isNaN(seleccion));
-      realizarPeticion(seleccion);
-    } else {
-      console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
-      console.log(">>\t\tAlert message\t\t<<");
-      console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
-      console.log(">>' " + opcion + "'" + " No es una opción válida\t\t<<");
-      console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\n");
-      contar++;
-      if (contar === 3) {
-        console.log("No se permiten más intentos");
-        console.log("Exit...");
-        rl.close();
-        process.exit();
-      } else {
-        console.log("Intento(s) permitido(s): " + (3 - contar));
-      }
-      setTimeout(verMenu, 2000);
-    }
+    verificar(1, 5, seleccion, parseInt(1));
   });
 }
 
@@ -77,7 +60,7 @@ function verMenu() {
  * Este es un método que ejecuta la peticion solicitada.
  * No retorna ningun valor.
  */
-function realizarPeticion(seleccion) {
+function mostrarMenuInicial(seleccion) {
   // Evaluar la opción seleccionada utilizando switch
   switch (seleccion) {
     case 1:
@@ -99,6 +82,86 @@ function realizarPeticion(seleccion) {
   }
 }
 /**
+ * Este es un método que ejecuta la peticion solicitada.
+ * No retorna ningun valor.
+ */
+function actualizarNombre() {
+  rl.question("Ingrese los nombres para el contacto: ", (nuevoNombre) => {
+    arrayContacto[indice].nombre = nuevoNombre;
+    console.log("Nombre actualizado correctamente.");
+
+    rl.question(
+      "\n¿Desea continuar modificando este contacto? S/N: ",
+      (desicion) => {
+        let opc = desicion;
+        if (opc.toLowerCase() === "s") {
+          actualizarContactoActual();
+        } else {
+          verMenu();
+        }
+      }
+    );
+  });
+}
+function actualizarApellido() {
+  rl.question("Ingrese los apellidos para el contacto: ", (nuevoApellido) => {
+    arrayContacto[indice].apellido = nuevoApellido;
+    console.log("Apellido actualizado correctamente.");
+
+    rl.question(
+      "\n¿Desea continuar modificando este contacto? S/N: ",
+      (desicion) => {
+        let opc = desicion;
+        if (opc.toLowerCase() === "s") {
+          actualizarContactoActual();
+        } else {
+          verMenu();
+        }
+      }
+    );
+  });
+}
+function actualizarTelefono() {
+  rl.question("Ingrese el telefono para el contacto: ", (nuevoTelefono) => {
+    arrayContacto[indice].telefono = nuevoTelefono;
+    console.log("Telefono actualizado correctamente.");
+
+    rl.question(
+      "\n¿Desea continuar modificando este contacto? S/N: ",
+      (desicion) => {
+        let opc = desicion;
+        if (opc.toLowerCase() === "s") {
+          actualizarContactoActual();
+        } else {
+          verMenu();
+        }
+      }
+    );
+  });
+}
+function actualizarUbicacion() {
+  rl.question("Ingrese la ciudad para el contacto: ", (nuevaCiudad) => {
+    rl.question("Ingrese la direccion para el contacto: ", (nuevaDireccion) => {
+      arrayContacto[indice].ubicacion[0] = nuevaCiudad;
+      arrayContacto[indice].ubicacion[1] = nuevaDireccion;
+      console.log("Apellido actualizado correctamente.");
+
+      rl.question(
+        "\n¿Desea continuar modificando este contacto? S/N: ",
+        (desicion) => {
+          let opc = desicion;
+          if (opc.toLowerCase() === "s") {
+            actualizarContactoActual();
+          } else {
+            verMenu();
+          }
+        }
+      );
+    });
+  });
+}
+
+/**
  * Este es un método que permite finalizar el programa o volver al menu
  * No retorna ningun valor.
  */
@@ -108,7 +171,7 @@ function salir() {
     rl.close();
     process.exit();
   }
-  rl.question("\n¿Desea volver al menu anterior? S/N: ", (desicion) => {
+  rl.question("\nVolver al menu incial=> S / salir => N: ", (desicion) => {
     let opc = desicion;
     if (opc.toLowerCase() === "s") {
       verMenu();
@@ -125,7 +188,7 @@ function salir() {
  * @returns {function} Una funcion que recibe dos argumentos: un metodo y el tiempo de ejecucion en milisegundos .
  */
 function crearContacto() {
-  let indice = 0;
+  indice = 0;
   const { v4: uuidv4 } = require("uuid");
   const idUnico = uuidv4();
 
@@ -144,16 +207,14 @@ function crearContacto() {
             };
             arrayContacto.push(nuevoContacto);
             indice = arrayContacto.length - 1;
+            ñ;
             console.log(arrayContacto[indice]);
 
             contacto = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\n";
             contacto += "X Id: " + arrayContacto[indice].id + " \n";
-            contacto +=
-              "X Nombres: " + arrayContacto[indice].nombre + "\t\t\tX\n";
-            contacto +=
-              "X Apellidos: " + arrayContacto[indice].apellido + "\t\tX\n";
-            contacto +=
-              "X Telefono: " + arrayContacto[indice].telefono + "\t\t\tX\n";
+            contacto += "X Nombres: " + arrayContacto[indice].nombre + "\n";
+            contacto += "X Apellidos: " + arrayContacto[indice].apellido + "\n";
+            contacto += "X Telefono: " + arrayContacto[indice].telefono + "\n";
             contacto +=
               "X Ciudad: " + arrayContacto[indice].ubicacion[0] + "\t\t\tX\n";
             contacto +=
@@ -168,6 +229,104 @@ function crearContacto() {
       });
     });
   });
+}
+
+function actualizarContacto() {
+  indice = 0;
+  textoMenu = "";
+  let respuesta = "";
+  rl.question(
+    "Ingrese el id del contacto que desea actualizar: ",
+    (contactoId) => {
+      const existir = (arrayContacto) => arrayContacto.id === contactoId;
+
+      indice = arrayContacto.findIndex(existir);
+
+      if (!(indice === -1)) {
+        respuesta = "El contacto se puede modificar";
+        textoMenu = "\n";
+        textoMenu += "|=======================================|\n";
+        textoMenu += "|>>\tModificar contacto\t\t|\n";
+        textoMenu += "|=======================================|\n";
+        textoMenu += "| 1. Nombres.\t\t\t\t|\n";
+        textoMenu += "| 2. Apellidos.\t\t\t\t|\n";
+        textoMenu += "| 3. Telefono.\t\t\t\t|\n";
+        textoMenu += "| 4. Ubicación (Ciudad/Dirección).\t|\n";
+        textoMenu += "|=======================================|";
+        console.log("\n|=======================================|");
+        console.log("| " + respuesta);
+        console.log("|=======================================|");
+
+        console.log(arrayContacto[indice]);
+
+        console.log(textoMenu);
+      } else {
+        respuesta = "El contacto no se puede modificar";
+        console.log("|=======================================|");
+        console.log("| " + respuesta);
+        console.log("|=======================================|");
+        salir();
+      }
+      console.log("|=======================================|");
+      rl.question("| Elija la opcion que desea modificar:", (opcion) => {
+        console.log("|=======================================|\n");
+        seleccion = parseInt(opcion);
+        verificar(1, 4, seleccion, parseInt(2));
+      });
+    }
+  );
+  return setTimeout(salir, 1000);
+}
+function actualizarContactoActual() {
+  console.log(arrayContacto[indice]);
+  textoMenu = "\n";
+  textoMenu += "|=======================================|\n";
+  textoMenu += "|\tModificar contacto\t\t|\n";
+  textoMenu += "|=======================================|\n";
+  textoMenu += "| 1. Nombres.\t\t\t\t|\n";
+  textoMenu += "| 2. Apellidos.\t\t\t\t|\n";
+  textoMenu += "| 3. Telefono.\t\t\t\t|\n";
+  textoMenu += "| 4. Ubicación.\t\t\t\t|\n";
+  textoMenu += "|=======================================|";
+  console.log(textoMenu);
+  rl.question("Elija una opcion:", (opcion) => {
+    console.log("|=======================================|\n");
+    seleccion = parseInt(opcion);
+    verificar(1, 4, seleccion, parseInt(2));
+    return setTimeout(salir, 1000);
+  });
+}
+
+function verificar(inicio, fin, seleccion, id) {
+  if (!isNaN(seleccion) && seleccion >= inicio && seleccion <= fin) {
+    if (id === 1) {
+      mostrarMenuInicial(seleccion);
+    } else if (id === 2) {
+      seleccion === 1
+        ? actualizarNombre(indice)
+        : seleccion === 2
+        ? actualizarApellido(indice)
+        : seleccion === 3
+        ? actualizarTelefono(indice)
+        : actualizarUbicacion(indice);
+    }
+  } else {
+    console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+    console.log(">>\t\tAlert message\t\t<<");
+    console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+    console.log(">>'" + seleccion + "'" + " No es una opción válida\t\t<<");
+    console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\n");
+    contar++;
+    if (contar === 3) {
+      console.log("No se permiten más intentos");
+      console.log("exit...");
+      rl.close();
+      process.exit();
+    } else {
+      console.log("Intento(s) permitido(s): " + (3 - contar));
+    }
+  }
+  return setTimeout(salir, 1000);
 }
 /**
  * Este es un método que elimina un contacto.
